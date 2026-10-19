@@ -115,6 +115,123 @@
   }
   .onglet.actif { background: #7928ca; color: #fff; }
   .contenu { line-height: 1.5; font-size: 1rem; }
+  
+  /* Formulaire d'e-mail visiteur */
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .newsletter-input {
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .newsletter-input:focus {
+    border-color: #7928ca;
+  }
+  .newsletter-btn {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #7928ca;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .newsletter-btn:hover {
+    background: #621fa7;
+  }
+  .newsletter-msg {
+    font-size: 0.9rem;
+    color: #28a745;
+    margin-top: 4px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  /* Bouton Admin visible en bas à gauche */
+  #naming-panel-trigger {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 999;
+    font-size: 0.9rem;
+    backdrop-filter: blur(6px);
+    transition: background 0.2s;
+  }
+  #naming-panel-trigger:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  /* Panneau Admin */
+  #admin-panel {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+    background: #111;
+    color: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    width: 320px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    font-family: Arial, sans-serif;
+    border: 2px solid #7928ca;
+  }
+  #admin-panel h3 { margin: 0 0 10px; font-size: 1.1rem; color: #ff8c00; }
+  #admin-panel textarea, #admin-panel input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-bottom: 8px;
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  #admin-panel textarea { height: 80px; resize: vertical; }
+  .admin-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .admin-btn:hover { background: #218838; }
+  .admin-btn-secondary {
+    background: #0070f3;
+  }
+  .admin-btn-secondary:hover { background: #005bb5; }
+  #admin-close {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    float: right;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
   @keyframes bg {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -138,10 +255,10 @@
 
       <div class="onglets">
         <button class="onglet actif" data-cible="projet">Le projet</button>
-        <button class="onglet" data-cible="createur">Le créateur</button>
+        <button class="onglet" data-cible="createur">Préviens-moi</button>
       </div>
 
-      <!-- 👇 MODIFIE ICI LE TEXTE DU PROJET -->
+      <!-- 👇 PROJET -->
       <div id="projet" class="contenu">
         <strong>🤫 Top secret…</strong><br>
         Un projet se prépare dans l’ombre.<br>
@@ -150,15 +267,53 @@
         Tu as une idée ? Réponse très bientôt. 👀
       </div>
 
-      <!-- 👇 MODIFIE ICI LE TEXTE SUR TOI -->
+      <!-- 👇 INSCRIPTION EMAIL UTILISATEUR -->
       <div id="createur" class="contenu" hidden>
-        <strong>Darflux</strong><br>
-        Salut, moi c’est Darflux ! 👋<br>
-        J’adore créer des projets, imaginer des choses et les voir prendre vie.<br>
-        Celui-ci me tient particulièrement à cœur : j’avais vraiment envie de le faire, et je mets tout ce que j’ai dedans.<br>
-        Merci d’être passé, ça veut dire beaucoup. Reste dans le coin, la suite arrive. 🚀
+        <strong>Restez informés 🚀</strong><br>
+        Laisse ton adresse e-mail pour recevoir une alerte dès que le site sera officiellement en ligne !<br>
+        
+        <form class="newsletter-form" id="emailForm" onsubmit="event.preventDefault(); handleEmailSubmit();">
+          <input type="email" id="userEmail" class="newsletter-input" placeholder="ton.email@exemple.com" required>
+          <button type="submit" class="newsletter-btn">M'inscrire</button>
+          <div id="newsletterMsg" class="newsletter-msg" style="display: none;">✨ C'est enregistré ! Merci.</div>
+        </form>
       </div>
     </div>
+  </div>
+
+  <!-- BOUTON ADMIN VISIBLE EN BAS À GAUCHE -->
+  <button id="naming-panel-trigger" onclick="openAdminWithCode()">🔐 Admin</button>
+
+  <!-- PANNEAU ADMIN (PROTÉGÉ PAR CODE) -->
+  <div id="admin-panel">
+    <button id="admin-close" onclick="document.getElementById('admin-panel').style.display='none'">✕</button>
+    <h3>🔒 Naming Panel</h3>
+    <p style="font-size: 0.8rem; margin: 0 0 8px; color: #ccc;">E-mails enregistrés : <span id="countEmails">0</span></p>
+    
+    <button class="admin-btn admin-btn-secondary" onclick="sendEmailsToEveryone()">Envoyer à tout le monde 📨</button>
+
+    <hr style="border-color: #333; margin: 12px 0;">
+
+    <label style="font-size: 0.8rem; color:#aaa;">Objet du mail :</label>
+    <input type="text" id="adminSubject" value="🎉 C'est bon, le site est en ligne !">
+    
+    <label style="font-size: 0.8rem; color:#aaa;">Message rédigé :</label>
+    <textarea id="adminMessage">Salut ! 👋
+
+Le moment tant attendu est enfin arrivé : le site est officiellement en ligne et hébergé ! 🚀
+
+Tu peux dès maintenant venir le découvrir ici : 
+[Insère ton lien ici]
+
+Merci d'avoir patienté et d'avoir suivi le projet depuis le début. À très vite !
+
+— L'équipe</textarea>
+
+    <hr style="border-color: #333; margin: 12px 0;">
+
+    <label style="font-size: 0.8rem; color:#aaa;">Modifier le mot de passe Admin :</label>
+    <input type="text" id="newAdminPassword" placeholder="Nouveau mot de passe">
+    <button class="admin-btn" onclick="saveNewPassword()">Changer le mot de passe</button>
   </div>
 
   <script>
@@ -219,6 +374,82 @@
         document.getElementById(onglet.dataset.cible).hidden = false;
       });
     });
+
+    // Gestion des e-mails en local
+    function getStoredEmails() {
+      return JSON.parse(localStorage.getItem("subscribers_list") || "[]");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateAdminCount();
+    });
+
+    // Enregistrement de l'e-mail sans redirection de page
+    function handleEmailSubmit() {
+      const emailInput = document.getElementById("userEmail");
+      const msgDiv = document.getElementById("newsletterMsg");
+      
+      if(emailInput.value.trim() !== "") {
+        let emails = getStoredEmails();
+        if(!emails.includes(emailInput.value.trim())) {
+          emails.push(emailInput.value.trim());
+          localStorage.setItem("subscribers_list", JSON.stringify(emails));
+        }
+
+        msgDiv.style.display = "block";
+        emailInput.value = "";
+        updateAdminCount();
+        
+        setTimeout(() => {
+          msgDiv.style.display = "none";
+        }, 4000);
+      }
+    }
+
+    function updateAdminCount() {
+      document.getElementById("countEmails").textContent = getStoredEmails().length;
+    }
+
+    // Gestion du mot de passe admin sécurisé et persistant
+    function getAdminPassword() {
+      return localStorage.getItem("admin_password") || "1234";
+    }
+
+    function openAdminWithCode() {
+      let code = prompt("Entre le code d'accès administrateur :");
+      if (code === getAdminPassword()) {
+        document.getElementById("admin-panel").style.display = "block";
+        updateAdminCount();
+      } else if (code !== null) {
+        alert("Code incorrect.");
+      }
+    }
+
+    function saveNewPassword() {
+      const newPassInput = document.getElementById("newAdminPassword");
+      if (newPassInput.value.trim() !== "") {
+        localStorage.setItem("admin_password", newPassInput.value.trim());
+        alert("Mot de passe modifié et sauvegardé avec succès !");
+        newPassInput.value = "";
+      } else {
+        alert("Veuillez entrer un mot de passe valide.");
+      }
+    }
+
+    // Fonction d'envoi groupé par mail
+    function sendEmailsToEveryone() {
+      let emails = getStoredEmails();
+      if(emails.length === 0) {
+        alert("Aucun e-mail enregistré pour le moment !");
+        return;
+      }
+      
+      let subject = encodeURIComponent(document.getElementById("adminSubject").value);
+      let body = encodeURIComponent(document.getElementById("adminMessage").value);
+      
+      let mailtoLink = `mailto:?bcc=${emails.join(",")}&subject=${subject}&body=${body}`;
+      window.location.href = mailtoLink;
+    }
   </script>
 </body>
 </html>
