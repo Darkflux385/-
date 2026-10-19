@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SOON</title>
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3vh; box-sizing: border-box;
+    padding: env(safe-area-inset-top, 0px) 16px env(safe-area-inset-bottom, 0px);
+    background: linear-gradient(120deg, #ff0080, #ff8c00, #40e0d0, #7928ca, #0070f3, #ff0080);
+    background-size: 400% 400%;
+    animation: bg 12s ease infinite;
+    overflow: hidden;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+  h1 {
+    margin: 0;
+    font-size: clamp(3rem, 18vw, 16rem);
+    font-weight: 900;
+    letter-spacing: .02em;
+    color: #fff;
+    text-shadow: 0 8px 40px rgba(0,0,0,.35);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  p {
+    margin: 0; text-align: center;
+    font-size: clamp(1rem, 3vw, 2rem);
+    font-weight: 600; letter-spacing: .15em; text-transform: uppercase;
+    color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,.35);
+  }
+  #info-btn {
+    position: relative;
+    padding: 16px 34px; border: 2px solid rgba(255,255,255,.9); border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,.08));
+    color: #fff; overflow: hidden;
+    font-size: 1.1rem; font-weight: 700; letter-spacing: .04em; cursor: pointer;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 30px rgba(0,0,0,.25);
+    text-shadow: 0 2px 8px rgba(0,0,0,.3);
+    animation: flotte 3s ease-in-out infinite, halo 2.4s ease-out infinite;
+  }
+  #info-btn::after {
+    content: ""; position: absolute; top: 0; left: -80%;
+    width: 50%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+    transform: skewX(-20deg);
+    animation: reflet 3.5s ease-in-out infinite;
+  }
+  #info-btn { transition: transform .2s, background .2s; }
+  #info-btn:hover {
+    transform: scale(1.08);
+    background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(255,255,255,.15));
+  }
+  #info-btn:active { transform: scale(.95); }
+  #info-btn.clic { animation: rebond .5s ease; }
+  .particule {
+    position: fixed; width: 10px; height: 10px; border-radius: 50%;
+    pointer-events: none; z-index: 20;
+  }
+  #modal.ouvert .boite { animation: apparition .35s cubic-bezier(.2, 1.2, .4, 1); }
+  @keyframes rebond {
+    0% { transform: scale(1); }
+    30% { transform: scale(.85); }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  #modal.sortie { animation: fondu .3s ease forwards; }
+  #modal.sortie .boite { animation: disparition .3s ease-in forwards; }
+  @keyframes flotte {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -6px; }
+  }
+  @keyframes halo {
+    0% { box-shadow: 0 8px 30px rgba(0,0,0,.25), 0 0 0 0 rgba(255,255,255,.5); }
+    100% { box-shadow: 0 8px 30px rgba(0,0,0,.25), 0 0 0 20px rgba(255,255,255,0); }
+  }
+  @keyframes reflet {
+    0%, 60% { left: -80%; }
+    100% { left: 140%; }
+  }
+  @keyframes fondu {
+    to { opacity: 0; }
+  }
+  @keyframes disparition {
+    to { opacity: 0; transform: scale(.7) translateY(40px) rotate(-3deg); }
+  }
+  @keyframes apparition {
+    from { opacity: 0; transform: scale(.8) translateY(20px); }
+    to { opacity: 1; transform: none; }
+  }
+  #modal {
+    position: fixed; inset: 0; z-index: 10;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px; background: rgba(0,0,0,.55);
+  }
+  #modal.ouvert { display: flex; }
+  .boite {
+    position: relative; width: 100%; max-width: 420px;
+    background: #fff; color: #222; border-radius: 20px;
+    padding: 28px 24px 24px; box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  }
+  .boite h2 { margin: 0 0 16px; font-size: 1.5rem; }
+  #fermer {
+    position: absolute; top: 12px; right: 12px;
+    width: 36px; height: 36px; border: 0; border-radius: 50%;
+    background: #eee; color: #222; font-size: 1rem; cursor: pointer;
+  }
+  .onglets { display: flex; gap: 8px; margin-bottom: 16px; }
+  .onglet {
+    flex: 1; padding: 10px; border: 0; border-radius: 10px;
+    background: #eee; color: #222; font-weight: 600; cursor: pointer;
+  }
+  .onglet.actif { background: #7928ca; color: #fff; }
+  .contenu { line-height: 1.5; font-size: 1rem; }
+  
+  /* Formulaire d'e-mail visiteur */
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .newsletter-input {
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .newsletter-input:focus {
+    border-color: #7928ca;
+  }
+  .newsletter-btn {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #7928ca;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .newsletter-btn:hover {
+    background: #621fa7;
+  }
+  .newsletter-msg {
+    font-size: 0.9rem;
+    color: #28a745;
+    margin-top: 4px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  /* Bouton Admin visible en bas à gauche */
+  #naming-panel-trigger {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 999;
+    font-size: 0.9rem;
+    backdrop-filter: blur(6px);
+    transition: background 0.2s;
+  }
+  #naming-panel-trigger:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  /* Panneau Admin */
+  #admin-panel {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+    background: #111;
+    color: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    width: 320px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    font-family: Arial, sans-serif;
+    border: 2px solid #7928ca;
+  }
+  #admin-panel h3 { margin: 0 0 10px; font-size: 1.1rem; color: #ff8c00; }
+  #admin-panel textarea, #admin-panel input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-bottom: 8px;
+    background: #222;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  #admin-panel textarea { height: 80px; resize: vertical; }
+  .admin-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+  .admin-btn:hover { background: #218838; }
+  .admin-btn-secondary {
+    background: #0070f3;
+  }
+  .admin-btn-secondary:hover { background: #005bb5; }
+  #admin-close {
+    background: transparent;
+    border: none;
+    color: #aaa;
+    float: right;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  @keyframes bg {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(.85); }
+    50% { transform: scale(1.1); }
+  }
+</style>
+</head>
+<body>
+  <h1>SOON</h1>
+  <button id="info-btn">ℹ️ Infos</button>
+  <p>Ça arrive bientôt</p>
+
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titre">
+    <div class="boite">
+      <button id="fermer" aria-label="Fermer">✕</button>
+      <h2 id="modal-titre">Infos</h2>
+
+      <div class="onglets">
+        <button class="onglet actif" data-cible="projet">Le projet</button>
+        <button class="onglet" data-cible="createur">Préviens-moi</button>
+      </div>
+
+      <!-- 👇 PROJET -->
+      <div id="projet" class="contenu">
+        <strong>🤫 Top secret…</strong><br>
+        Un projet se prépare dans l’ombre.<br>
+        Un petit carré noir et blanc, mais plein de surprises cachées : un lien, un profil, une connexion…<br>
+        <em>Un seul scan suffit.</em><br>
+        Tu as une idée ? Réponse très bientôt. 👀
+      </div>
+
+      <!-- 👇 INSCRIPTION EMAIL UTILISATEUR -->
+      <div id="createur" class="contenu" hidden>
+        <strong>Restez informés 🚀</strong><br>
+        Laisse ton adresse e-mail pour recevoir une alerte dès que le site sera officiellement en ligne !<br>
+        
+        <form class="newsletter-form" id="emailForm" onsubmit="event.preventDefault(); handleEmailSubmit();">
+          <input type="email" id="userEmail" class="newsletter-input" placeholder="ton.email@exemple.com" required>
+          <button type="submit" class="newsletter-btn">M'inscrire</button>
+          <div id="newsletterMsg" class="newsletter-msg" style="display: none;">✨ C'est enregistré ! Merci.</div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOUTON ADMIN VISIBLE EN BAS À GAUCHE -->
+  <button id="naming-panel-trigger" onclick="openAdminWithCode()">🔐 Admin</button>
+
+  <!-- PANNEAU ADMIN (PROTÉGÉ PAR CODE) -->
+  <div id="admin-panel">
+    <button id="admin-close" onclick="document.getElementById('admin-panel').style.display='none'">✕</button>
+    <h3>🔒 Naming Panel</h3>
+    <p style="font-size: 0.8rem; margin: 0 0 8px; color: #ccc;">E-mails enregistrés : <span id="countEmails">0</span></p>
+    
+    <button class="admin-btn admin-btn-secondary" onclick="sendEmailsToEveryone()">Envoyer à tout le monde 📨</button>
+
+    <hr style="border-color: #333; margin: 12px 0;">
+
+    <label style="font-size: 0.8rem; color:#aaa;">Objet du mail :</label>
+    <input type="text" id="adminSubject" value="🎉 C'est bon, le site est en ligne !">
+    
+    <label style="font-size: 0.8rem; color:#aaa;">Message rédigé :</label>
+    <textarea id="adminMessage">Salut ! 👋
+
+Le moment tant attendu est enfin arrivé : le site est officiellement en ligne et hébergé ! 🚀
+
+Tu peux dès maintenant venir le découvrir ici : 
+[Insère ton lien ici]
+
+Merci d'avoir patienté et d'avoir suivi le projet depuis le début. À très vite !
+
+— L'équipe</textarea>
+
+    <hr style="border-color: #333; margin: 12px 0;">
+
+    <label style="font-size: 0.8rem; color:#aaa;">Modifier le mot de passe Admin :</label>
+    <input type="text" id="newAdminPassword" placeholder="Nouveau mot de passe">
+    <button class="admin-btn" onclick="saveNewPassword()">Changer le mot de passe</button>
+  </div>
+
+  <script>
+    const modal = document.getElementById("modal");
+    const ouvrir = () => {
+      modal.classList.remove("sortie");
+      modal.classList.add("ouvert");
+    };
+    const fermer = () => {
+      if (!modal.classList.contains("ouvert") || modal.classList.contains("sortie")) return;
+      modal.classList.add("sortie");
+      setTimeout(() => modal.classList.remove("ouvert", "sortie"), 300);
+    };
+
+    const btn = document.getElementById("info-btn");
+    btn.addEventListener("animationend", (e) => {
+      if (e.animationName === "rebond") btn.classList.remove("clic");
+    });
+    btn.addEventListener("click", () => {
+      btn.classList.remove("clic");
+      void btn.offsetWidth;
+      btn.classList.add("clic");
+
+      const r = btn.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const couleurs = ["#ff0080", "#ff8c00", "#40e0d0", "#ffffff", "#ffe600"];
+      const nb = 18;
+      for (let i = 0; i < nb; i++) {
+        const p = document.createElement("span");
+        p.className = "particule";
+        p.style.left = (cx - 5) + "px";
+        p.style.top = (cy - 5) + "px";
+        p.style.background = couleurs[i % couleurs.length];
+        document.body.appendChild(p);
+        const angle = (Math.PI * 2 * i) / nb;
+        const dist = 70 + Math.random() * 60;
+        p.animate(
+          [
+            { transform: "translate(0, 0) scale(1)", opacity: 1 },
+            { transform: `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) scale(0)`, opacity: 0 }
+          ],
+          { duration: 700, easing: "ease-out" }
+        ).onfinish = () => p.remove();
+      }
+
+      setTimeout(ouvrir, 350);
+    });
+
+    document.getElementById("fermer").addEventListener("click", fermer);
+    modal.addEventListener("click", (e) => { if (e.target === modal) fermer(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") fermer(); });
+
+    document.querySelectorAll(".onglet").forEach((onglet) => {
+      onglet.addEventListener("click", () => {
+        document.querySelectorAll(".onglet").forEach((o) => o.classList.remove("actif"));
+        document.querySelectorAll(".contenu").forEach((c) => (c.hidden = true));
+        onglet.classList.add("actif");
+        document.getElementById(onglet.dataset.cible).hidden = false;
+      });
+    });
+
+    // Gestion des e-mails en local
+    function getStoredEmails() {
+      return JSON.parse(localStorage.getItem("subscribers_list") || "[]");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateAdminCount();
+    });
+
+    // Enregistrement de l'e-mail sans redirection de page
+    function handleEmailSubmit() {
+      const emailInput = document.getElementById("userEmail");
+      const msgDiv = document.getElementById("newsletterMsg");
+      
+      if(emailInput.value.trim() !== "") {
+        let emails = getStoredEmails();
+        if(!emails.includes(emailInput.value.trim())) {
+          emails.push(emailInput.value.trim());
+          localStorage.setItem("subscribers_list", JSON.stringify(emails));
+        }
+
+        msgDiv.style.display = "block";
+        emailInput.value = "";
+        updateAdminCount();
+        
+        setTimeout(() => {
+          msgDiv.style.display = "none";
+        }, 4000);
+      }
+    }
+
+    function updateAdminCount() {
+      document.getElementById("countEmails").textContent = getStoredEmails().length;
+    }
+
+    // Gestion du mot de passe admin sécurisé et persistant
+    function getAdminPassword() {
+      return localStorage.getItem("admin_password") || "Alex";
+    }
+
+    function openAdminWithCode() {
+      let code = prompt("Entre le code d'accès administrateur :");
+      if (code === getAdminPassword()) {
+        document.getElementById("admin-panel").style.display = "block";
+        updateAdminCount();
+      } else if (code !== null) {
+        alert("Code incorrect.");
+      }
+    }
+
+    function saveNewPassword() {
+      const newPassInput = document.getElementById("newAdminPassword");
+      if (newPassInput.value.trim() !== "") {
+        localStorage.setItem("admin_password", newPassInput.value.trim());
+        alert("Mot de passe modifié et sauvegardé avec succès !");
+        newPassInput.value = "";
+      } else {
+        alert("Veuillez entrer un mot de passe valide.");
+      }
+    }
+
+    // Fonction d'envoi groupé par mail
+    function sendEmailsToEveryone() {
+      let emails = getStoredEmails();
+      if(emails.length === 0) {
+        alert("Aucun e-mail enregistré pour le moment !");
+        return;
+      }
+      
+      let subject = encodeURIComponent(document.getElementById("adminSubject").value);
+      let body = encodeURIComponent(document.getElementById("adminMessage").value);
+      
+      let mailtoLink = `mailto:?bcc=${emails.join(",")}&subject=${subject}&body=${body}`;
+      window.location.href = mailtoLink;
+    }
+  </script>
+</body>
+</html>
