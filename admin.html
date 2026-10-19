@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="carte">
+    <h1>🔒 Panneau admin</h1>
+
+    <label for="cle">Ta clé admin <small>(celle que tu as mise dans Google, jamais enregistrée ici)</small></label>
+    <input type="password" id="cle" autocomplete="off">
+    <button id="compter">Voir le nombre d’inscrits 🔢</button>
+
+    <hr>
+
+    <label for="objet">Objet du mail</label>
+    <input type="text" id="objet" value="🎉 C’est bon, le site est en ligne !">
+
+    <label for="message">Message</label>
+    <textarea id="message" rows="10">Salut ! 👋
+
+Le moment tant attendu est enfin arrivé : le site est officiellement en ligne et hébergé ! 🚀
+
+Tu peux dès maintenant venir le découvrir ici :
+[Insère ton lien ici]
+
+Merci d’avoir patienté et d’avoir suivi le projet depuis le début. À très vite !
+
+— L’équipe
+
+(Tu reçois ce mail car tu t’es inscrit(e) sur la page d’attente. Réponds « stop » pour ne plus rien recevoir.)</textarea>
+
+    <button id="envoyer" class="bleu">Envoyer à tous les inscrits 📨</button>
+    <div id="info" class="info" hidden></div>
+  </main>
+  <script src="../js/config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

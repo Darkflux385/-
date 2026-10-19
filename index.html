@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SOON</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <h1>SOON</h1>
+  <button id="info-btn">ℹ️ Infos</button>
+  <p>Ça arrive bientôt</p>
+
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titre">
+    <div class="boite">
+      <button id="fermer" aria-label="Fermer">✕</button>
+      <h2 id="modal-titre">Infos</h2>
+
+      <div class="onglets">
+        <button class="onglet actif" data-cible="projet">Le projet</button>
+        <button class="onglet" data-cible="prevenir">Préviens-moi</button>
+      </div>
+
+      <!-- 👇 PROJET -->
+      <div id="projet" class="contenu">
+        <strong>🤫 Top secret…</strong><br>
+        Un projet se prépare dans l’ombre.<br>
+        Un petit carré noir et blanc, mais plein de surprises cachées : un lien, un profil, une connexion…<br>
+        <em>Un seul scan suffit.</em><br>
+        Tu as une idée ? Réponse très bientôt. 👀
+      </div>
+
+      <!-- 👇 INSCRIPTION E-MAIL -->
+      <div id="prevenir" class="contenu" hidden>
+        <strong>Restez informés 🚀</strong><br>
+        Laisse ton adresse e-mail pour recevoir une alerte dès que le site sera officiellement en ligne !
+
+        <form class="newsletter-form" id="emailForm">
+          <input type="email" id="userEmail" class="newsletter-input" placeholder="ton.email@exemple.com" required>
+          <input type="text" id="site" name="site" class="piege" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button type="submit" class="newsletter-btn">M’inscrire</button>
+          <small class="newsletter-note">Ton adresse sert uniquement à te prévenir de la sortie du site.</small>
+          <div id="newsletterMsg" class="newsletter-msg" hidden></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
